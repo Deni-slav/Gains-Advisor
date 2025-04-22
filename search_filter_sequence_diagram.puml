@@ -1,0 +1,108 @@
+@startuml Search and Filter Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor User
+participant "FitnessAppGUI" as GUI
+participant "GymManager" as GM
+participant "SearchForm" as SF
+participant "SearchResultsView" as SRV
+database "Gym Database" as DB
+
+' Сценарий
+== Търсене и филтриране на фитнес зали ==
+
+User -> GUI: Избира "Търсене на фитнеси"
+activate GUI
+
+GUI -> SF: show_search_form()
+activate SF
+
+SF -> User: Показва форма за търсене
+note right: Поле за ключова дума\nФилтри за локация, услуги, цена
+
+alt Потребителят въвежда ключова дума
+    User -> SF: Въвежда ключова дума
+    SF -> GM: search_by_keyword(keyword)
+    activate GM
+    
+    GM -> DB: Търси зали по ключова дума
+    DB --> GM: Връща съответстващи зали
+    
+    GM --> SF: Връща резултати
+    deactivate GM
+end
+
+alt Потребителят избира филтри
+    User -> SF: Избира филтри
+    note right: Локация, услуги, ценови диапазон
+    
+    SF -> GM: apply_filters(criteria)
+    activate GM
+    
+    GM -> DB: Филтрира зали по критерии
+    DB --> GM: Връща филтрирани зали
+    
+    GM --> SF: Връща филтрирани зали
+    deactivate GM
+end
+
+alt Потребителят изпраща търсене
+    User -> SF: Натиска "Търси"
+    deactivate SF
+    
+    SF -> GM: search_gyms(keyword, filters)
+    activate GM
+    
+    GM -> DB: Търси и филтрира зали
+    DB --> GM: Връща резултати
+    
+    GM --> SF: Връща резултати
+    deactivate GM
+    
+    GUI -> SRV: display_results(results)
+    activate SRV
+    
+    SRV -> User: Показва резултати от търсенето
+    note right: Сортирани по релевантност
+    
+    alt Потребителят иска сортиране
+        User -> SRV: Избира критерий за сортиране
+        note right: Име, рейтинг, цена, локация
+        
+        SRV -> SRV: sort_results(criteria)
+        SRV -> User: Показва сортирани резултати
+    end
+    
+    alt Потребителят избира зала
+        User -> SRV: Избира зала от резултатите
+        SRV -> GUI: show_gym_details(gym_id)
+        activate GUI
+        
+        GUI -> GM: get_gym_by_id(gym_id)
+        activate GM
+        
+        GM -> DB: Заявява детайли за залата
+        DB --> GM: Връща детайли за залата
+        
+        GM --> GUI: Връща детайли за залата
+        deactivate GM
+        
+        GUI -> User: Показва детайли за залата
+        deactivate GUI
+    end
+    
+    deactivate SRV
+end
+
+deactivate GUI
+
+@enduml 

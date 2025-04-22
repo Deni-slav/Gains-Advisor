@@ -1,0 +1,103 @@
+@startuml Fitness Application
+
+' Стилове
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+' Основни класове
+class FitnessAppGUI {
+  - root: Tk
+  - gym_manager: GymManager
+  - user_manager: UserManager
+  - review_manager: ReviewManager
+  - favorite_gyms: List[Gym]
+  + __init__(root: Tk)
+  + menu_ui()
+  + show_message(title: str, msg: str)
+  + handle_registration_login()
+  + view_gyms()
+  + handle_favorite_gyms()
+  + add_favourite_gyms()
+  + view_favorite_gyms()
+  + search_gyms()
+  + view_reviews()
+  + add_review()
+  + recommend_gyms()
+  + add_gym()
+  + handle_gym_editing()
+}
+
+class GymManager {
+  - nearby_gyms: List[Gym]
+  + __init__()
+  + add_gym(current_user: User)
+  + edit_gym(current_user: User)
+  + remove_gym(current_user: User)
+  + search_gyms(keyword: str): List[Gym]
+  + recommend_gyms(location: str): List[Gym]
+}
+
+class UserManager {
+  - registered_users: List[User]
+  - current_user: User
+  + __init__()
+  + register()
+  + login()
+  + logout()
+}
+
+class ReviewManager {
+  - gym_reviews: List[Review]
+  + __init__()
+  + add_review(current_user: User, gym_manager: GymManager)
+  + view_reviews(gym_manager: GymManager)
+}
+
+' Модели
+class Gym {
+  - id: int
+  - name: str
+  - address: str
+  - rating: float
+  - services: List[str]
+  - opening_hours: str
+  - price: str
+  - location: str
+  + __init__(id, name, address, rating, services, opening_hours, price, location)
+}
+
+class User {
+  - username: str
+  - email: str
+  - password: str
+  - role: str
+  - full_name: str
+  + __init__(username, email, password, role, full_name)
+}
+
+class Review {
+  - gym_id: int
+  - user_id: str
+  - rating: int
+  - comment: str
+  + __init__(gym_id, user_id, rating, comment)
+}
+
+' Връзки
+FitnessAppGUI --> GymManager : contains
+FitnessAppGUI --> UserManager : contains
+FitnessAppGUI --> ReviewManager : contains
+FitnessAppGUI --> Gym : favorite_gyms
+
+GymManager --> Gym : manages
+ReviewManager --> Review : manages
+UserManager --> User : manages
+
+Review --> Gym : references
+Review --> User : references
+
+@enduml 

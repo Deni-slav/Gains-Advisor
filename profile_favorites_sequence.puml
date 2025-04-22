@@ -1,0 +1,115 @@
+@startuml Profile and Favorites Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor User
+participant "FitnessAppGUI" as GUI
+participant "UserManager" as UM
+participant "FavoriteManager" as FM
+participant "ProfileManager" as PM
+database "User Database" as UDB
+database "Gym Database" as GDB
+
+' Сценарий
+== Управление на профил и любими зали ==
+
+== 1. Вход в профил ==
+User -> GUI: Избира "Моят профил"
+activate GUI
+
+GUI -> UM: get_user_profile(user_id)
+activate UM
+UM -> UDB: Заявява информация за потребителя
+UDB --> UM: Връща информация
+deactivate UM
+
+GUI -> User: Показва профилна информация
+note right: Име, имейл, роля,\nдата на регистрация
+
+== 2. Редактиране на профил ==
+User -> GUI: Избира "Редактирай профил"
+GUI -> PM: show_edit_profile_form()
+activate PM
+
+PM -> User: Показва форма за редактиране
+note right: Полета за промяна на информация
+
+User -> PM: Въвежда нови данни
+PM -> UM: update_profile(user_id, new_data)
+activate UM
+
+UM -> UDB: Обновява информация
+UDB --> UM: Потвърждава
+deactivate UM
+
+PM --> GUI: Връща успех
+deactivate PM
+
+GUI -> User: Показва потвърждение
+note right: Профилът е обновен
+
+== 3. Преглед на любими зали ==
+User -> GUI: Избира "Моите любими зали"
+GUI -> FM: get_favorite_gyms(user_id)
+activate FM
+
+FM -> GDB: Заявява любими зали
+GDB --> FM: Връща списък
+
+FM --> GUI: Връща списък
+deactivate FM
+
+GUI -> User: Показва любими зали
+note right: Име, адрес, рейтинг,\nцена, работно време
+
+== 4. Управление на любими ==
+alt Добавяне в любими
+    User -> GUI: Избира "Добави в любими"
+    GUI -> FM: add_to_favorites(gym_id, user_id)
+    activate FM
+    
+    FM -> GDB: Добавя в любими
+    GDB --> FM: Потвърждава
+    
+    FM --> GUI: Връща успех
+    deactivate FM
+    
+    GUI -> User: Показва потвърждение
+    note right: Залата е добавена в любими
+else Премахване от любими
+    User -> GUI: Избира "Премахни от любими"
+    GUI -> FM: remove_from_favorites(gym_id, user_id)
+    activate FM
+    
+    FM -> GDB: Премахва от любими
+    GDB --> FM: Потвърждава
+    
+    FM --> GUI: Връща успех
+    deactivate FM
+    
+    GUI -> User: Показва потвърждение
+    note right: Залата е премахната от любими
+end
+
+== 5. Изход от профил ==
+User -> GUI: Избира "Изход"
+GUI -> UM: logout_user()
+activate UM
+UM -> UDB: Обновява статус
+UDB --> UM: Потвърждава
+deactivate UM
+
+GUI -> User: Показва съобщение
+note right: Успешен изход от профила
+
+deactivate GUI
+
+@enduml 

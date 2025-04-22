@@ -1,0 +1,120 @@
+@startuml Gym Details Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor User
+participant "FitnessAppGUI" as GUI
+participant "GymManager" as GM
+participant "GymDetailsView" as GDV
+participant "ReviewManager" as RM
+database "Gym Database" as DB
+
+' Сценарий
+== Преглед на детайли за фитнес зала ==
+
+User -> GUI: Избира "Детайли за зала"
+activate GUI
+
+GUI -> GM: get_gym_details(gym_id)
+activate GM
+
+GM -> DB: Заявява основна информация
+DB --> GM: Връща основна информация
+note right: Име, адрес, рейтинг,\nцена, работно време
+
+GM --> GUI: Връща основна информация
+deactivate GM
+
+GUI -> GDV: display_basic_info(gym_info)
+activate GDV
+
+GDV -> User: Показва основна информация
+note right: Форматирано показване\nна основната информация
+
+alt Потребителят иска да види услуги
+    User -> GDV: Избира "Услуги"
+    GDV -> GM: get_gym_services(gym_id)
+    activate GM
+    
+    GM -> DB: Заявява списък с услуги
+    DB --> GM: Връща списък с услуги
+    
+    GM --> GDV: Връща списък с услуги
+    deactivate GM
+    
+    GDV -> User: Показва списък с услуги
+    note right: Форматиран списък\nс всички налични услуги
+end
+
+alt Потребителят иска да види работно време
+    User -> GDV: Избира "Работно време"
+    GDV -> GM: get_gym_hours(gym_id)
+    activate GM
+    
+    GM -> DB: Заявява работно време
+    DB --> GM: Връща работно време
+    
+    GM --> GDV: Връща работно време
+    deactivate GM
+    
+    GDV -> User: Показва работно време
+    note right: Таблица с работно време\nпо дни от седмицата
+end
+
+alt Потребителят иска да види отзиви
+    User -> GDV: Избира "Отзиви"
+    GDV -> RM: get_gym_reviews(gym_id)
+    activate RM
+    
+    RM -> DB: Заявява отзиви за залата
+    DB --> RM: Връща отзиви за залата
+    
+    RM --> GDV: Връща отзиви за залата
+    deactivate RM
+    
+    GDV -> User: Показва отзиви
+    note right: Списък с отзиви\nвключително рейтинг и коментари
+end
+
+alt Потребителят иска да види местоположение
+    User -> GDV: Избира "Местоположение"
+    GDV -> GM: get_gym_location(gym_id)
+    activate GM
+    
+    GM -> DB: Заявява информация за местоположение
+    DB --> GM: Връща информация за местоположение
+    
+    GM --> GDV: Връща информация за местоположение
+    deactivate GM
+    
+    GDV -> User: Показва местоположение
+    note right: Адрес и район\nвъзможност за показване на карта
+end
+
+alt Потребителят иска да добави в любими
+    User -> GDV: Избира "Добави в любими"
+    GDV -> GM: add_to_favorites(gym_id, user_id)
+    activate GM
+    
+    GM -> DB: Запазва в любими
+    DB --> GM: Потвърждава запазване
+    
+    GM --> GDV: Потвърждава успех
+    deactivate GM
+    
+    GDV -> User: Показва потвърждение
+    note right: Съобщение за успешно\nдобавяне в любими
+end
+
+deactivate GDV
+deactivate GUI
+
+@enduml 

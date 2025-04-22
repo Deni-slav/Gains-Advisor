@@ -1,0 +1,124 @@
+@startuml Detailed Review Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor "Потребител" as User
+participant "FitnessAppGUI" as GUI
+participant "GymManager" as GM
+participant "ReviewManager" as RM
+participant "ReviewForm" as RF
+participant "ValidationManager" as VM
+database "Gym Database" as DB
+
+' Сценарий
+== Последователност на оценяване и рецензиране ==
+
+== 1. Начало на процеса ==
+User -> GUI: Избира "Добави рецензия"
+activate GUI
+
+== 2. Зареждане на налични зали ==
+GUI -> GM: get_user_gyms(user_id)
+activate GM
+GM -> DB: Заявява зали за рецензиране
+DB --> GM: Връща списък с зали
+deactivate GM
+
+== 3. Показване на списък с зали ==
+GUI -> User: Показва списък с зали
+note right: Име, адрес, текущ рейтинг
+
+== 4. Избор на зала ==
+User -> GUI: Избира зала
+GUI -> RF: show_review_form(gym_id)
+activate RF
+
+== 5. Показване на форма за рецензия ==
+RF -> User: Показва форма за рецензия
+note right: Полета за оценка и коментар
+
+== 6. Въвеждане на оценка ==
+User -> RF: Избира оценка (1-5)
+RF -> VM: validate_rating(rating)
+activate VM
+VM --> RF: Връща резултат от валидация
+deactivate VM
+
+== 7. Въвеждане на коментар ==
+User -> RF: Въвежда коментар
+RF -> VM: validate_comment(comment)
+activate VM
+VM --> RF: Връща резултат от валидация
+deactivate VM
+
+== 8. Потвърждение и запазване ==
+User -> RF: Натиска "Публикувай"
+deactivate RF
+
+== 9. Обработка на рецензията ==
+RF -> RM: add_review(review_data)
+activate RM
+
+== 10. Валидация на рецензията ==
+RM -> VM: validate_review(review_data)
+activate VM
+VM --> RM: Връща резултат от валидация
+deactivate VM
+
+alt Валидацията е успешна
+    == 11. Запазване на рецензия ==
+    RM -> DB: Запазва рецензия
+    DB --> RM: Потвърждава запазване
+    
+    == 12. Обновяване на рейтинг ==
+    RM -> GM: update_gym_rating(gym_id)
+    activate GM
+    
+    GM -> DB: Заявява всички рецензии
+    DB --> GM: Връща рецензии
+    
+    GM -> GM: Изчислява нов рейтинг
+    GM -> DB: Обновява рейтинг на залата
+    DB --> GM: Потвърждава обновяване
+    deactivate GM
+    
+    == 13. Показване на успех ==
+    RM --> GUI: Връща успех
+    deactivate RM
+    
+    GUI -> User: Показва потвърждение
+    note right: Съобщение за успешно\nдобавяне на рецензия
+else Валидацията е неуспешна
+    == 14. Показване на грешки ==
+    RM --> GUI: Връща грешки
+    deactivate RM
+    
+    GUI -> User: Показва грешки
+    note right: Съобщения за корекция
+end
+
+== 15. Преглед на рецензии ==
+User -> GUI: Избира "Преглед на рецензии"
+GUI -> RM: get_gym_reviews(gym_id)
+activate RM
+
+RM -> DB: Заявява рецензии за залата
+DB --> RM: Връща рецензии
+
+RM --> GUI: Връща рецензии
+deactivate RM
+
+GUI -> User: Показва рецензии
+note right: Списък с рецензии\nвключително оценка и коментар
+
+deactivate GUI
+
+@enduml 

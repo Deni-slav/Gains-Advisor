@@ -1,0 +1,75 @@
+@startuml Favorite Gyms Scenario
+
+' Стилове
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+' Основни класове за сценария с любими фитнеси
+class FitnessAppGUI {
+  - favorite_gyms: List[Gym]
+  + __init__(root: Tk)
+  + handle_favorite_gyms()
+  + add_favourite_gyms()
+  + view_favorite_gyms()
+  + remove_from_favorites(gym_id: int)
+}
+
+class GymManager {
+  - nearby_gyms: List[Gym]
+  + __init__()
+  + get_gym_by_id(gym_id: int): Gym
+  + get_all_gyms(): List[Gym]
+}
+
+' Модели
+class Gym {
+  - id: int
+  - name: str
+  - address: str
+  - rating: float
+  - services: List[str]
+  - opening_hours: str
+  - price: str
+  - location: str
+  + __init__(id, name, address, rating, services, opening_hours, price, location)
+  + get_details(): str
+}
+
+class User {
+  - username: str
+  - email: str
+  - password: str
+  - role: str
+  - full_name: str
+  + __init__(username, email, password, role, full_name)
+  + is_logged_in(): bool
+}
+
+' Връзки
+FitnessAppGUI --> Gym : favorite_gyms
+FitnessAppGUI --> GymManager : uses
+FitnessAppGUI --> User : current_user
+
+GymManager --> Gym : manages
+
+User --> Gym : favorites
+
+' Сценарий
+note right of FitnessAppGUI
+  Сценарий: Потребителите запазват фитнес зали като "любими"
+end note
+
+note right of Gym
+  1. Потребителят влиза в системата
+  2. Избира опция "Любими фитнеси"
+  3. Избира "Добавяне към любими"
+  4. Избира фитнес от списъка
+  5. Фитнесът се добавя към любимите
+  6. Потребителят може да прегледа списъка с любими фитнеси
+end note
+
+@enduml 

@@ -1,0 +1,99 @@
+@startuml Registration Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor User
+participant "FitnessAppGUI" as GUI
+participant "UserManager" as UM
+participant "RegistrationForm" as RF
+database "User Database" as DB
+
+' Сценарий
+== Регистрация на нов потребител ==
+
+User -> GUI: Избира "Вход / Регистрация"
+activate GUI
+
+GUI -> User: Показва диалог за избор
+note right: 1 - Регистрация\n2 - Вход
+
+User -> GUI: Избира опция 1 (Регистрация)
+deactivate GUI
+
+GUI -> UM: register()
+activate UM
+
+UM -> User: Заявява потребителско име
+note right: Валидация: не може да е празно
+
+User -> UM: Въвежда потребителско име
+
+UM -> UM: is_username_taken(username)
+activate UM
+UM -> DB: Проверява за съществуващо име
+DB --> UM: Резултат от проверката
+deactivate UM
+
+alt Името вече съществува
+    UM -> User: Показва грешка
+    User -> UM: Въвежда ново име
+end
+
+UM -> User: Заявява имейл
+note right: Валидация: формат на имейл
+
+User -> UM: Въвежда имейл
+
+UM -> UM: is_email_taken(email)
+activate UM
+UM -> DB: Проверява за съществуващ имейл
+DB --> UM: Резултат от проверката
+deactivate UM
+
+alt Имейлът вече съществува
+    UM -> User: Показва грешка
+    User -> UM: Въвежда нов имейл
+end
+
+UM -> User: Заявява парола
+note right: Валидация: минимум 6 символа
+
+User -> UM: Въвежда парола
+
+UM -> User: Заявява потвърждение на паролата
+
+User -> UM: Въвежда потвърждение
+
+alt Паролите не съвпадат
+    UM -> User: Показва грешка
+    User -> UM: Въвежда пароли отново
+end
+
+UM -> User: Заявява пълно име
+
+User -> UM: Въвежда пълно име
+
+UM -> UM: validate_registration()
+activate UM
+UM -> UM: Проверява всички полета
+deactivate UM
+
+alt Валидацията е успешна
+    UM -> DB: Запазва нов потребител
+    DB --> UM: Потвърждение за запазване
+    UM -> User: Показва съобщение за успех
+else Валидацията е неуспешна
+    UM -> User: Показва грешки във валидацията
+end
+
+deactivate UM
+
+@enduml 

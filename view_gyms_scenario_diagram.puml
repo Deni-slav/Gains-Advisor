@@ -1,0 +1,109 @@
+@startuml View Gyms Scenario
+
+' Стилове
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+' Основни класове за сценария с преглед на фитнеси
+class FitnessAppGUI {
+  - gym_manager: GymManager
+  + __init__(root: Tk)
+  + view_gyms()
+  + show_gym_details(gym_id: int)
+  + show_message(title: str, msg: str)
+}
+
+class GymManager {
+  - nearby_gyms: List[Gym]
+  + __init__()
+  + get_all_gyms(): List[Gym]
+  + get_gym_by_id(gym_id: int): Gym
+  + get_gyms_by_location(location: str): List[Gym]
+  + get_gyms_by_service(service: str): List[Gym]
+  + get_gyms_by_price_range(min_price: float, max_price: float): List[Gym]
+}
+
+' Модели
+class Gym {
+  - id: int
+  - name: str
+  - address: str
+  - rating: float
+  - services: List[str]
+  - opening_hours: str
+  - price: str
+  - location: str
+  + __init__(id, name, address, rating, services, opening_hours, price, location)
+  + get_details(): str
+  + get_services_list(): str
+  + get_opening_hours_formatted(): str
+}
+
+' Форми
+class GymListView {
+  - gyms: List[Gym]
+  - listbox: Listbox
+  - filter_frame: Frame
+  - location_filter: Combobox
+  - service_filter: Combobox
+  - price_filter: Combobox
+  + __init__(parent, gym_manager)
+  + display_gyms(gyms: List[Gym])
+  + apply_filters()
+  + show_gym_details(gym_id: int)
+}
+
+class GymDetailsView {
+  - gym: Gym
+  - details_frame: Frame
+  - services_frame: Frame
+  - hours_frame: Frame
+  + __init__(parent, gym)
+  + display_details()
+  + display_services()
+  + display_hours()
+}
+
+' Връзки
+FitnessAppGUI --> GymManager : contains
+FitnessAppGUI --> GymListView : creates
+FitnessAppGUI --> GymDetailsView : creates
+
+GymManager --> Gym : manages
+
+GymListView --> Gym : displays
+GymListView --> GymManager : uses
+
+GymDetailsView --> Gym : displays
+
+' Сценарий
+note right of FitnessAppGUI
+  Сценарий: Преглед на фитнес зали
+end note
+
+note right of GymListView
+  1. Потребителят избира опция "Преглед на фитнеси"
+  2. Системата показва списък с всички фитнеси
+  3. Потребителят може да филтрира по:
+     - Локация
+     - Услуги
+     - Цена
+  4. Потребителят избира фитнес от списъка
+  5. Системата показва детайлна информация за избрания фитнес
+end note
+
+note right of GymDetailsView
+  Детайлна информация включва:
+  - Име и адрес
+  - Рейтинг
+  - Списък с услуги
+  - Работно време
+  - Цена
+  - Локация
+end note
+
+@enduml 

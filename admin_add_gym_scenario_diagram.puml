@@ -1,0 +1,137 @@
+@startuml Admin Add Gym Scenario
+
+' Стилове
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+' Основни класове за сценария с добавяне на нова фитнес зала
+class FitnessAppGUI {
+  - gym_manager: GymManager
+  - current_user: User
+  + __init__(root: Tk)
+  + check_admin_access(): bool
+  + show_admin_panel()
+  + show_message(title: str, msg: str)
+}
+
+class GymManager {
+  - nearby_gyms: List[Gym]
+  + __init__()
+  + add_gym(gym_data: Dict): Gym
+  + validate_gym_data(gym_data: Dict): bool
+  + save_gym_to_database(gym: Gym)
+  + update_gym_list()
+}
+
+' Модели
+class Gym {
+  - id: int
+  - name: str
+  - address: str
+  - rating: float
+  - services: List[str]
+  - opening_hours: str
+  - price: str
+  - location: str
+  - description: str
+  - equipment: List[str]
+  - trainers: List[str]
+  - photos: List[str]
+  + __init__(id, name, address, rating, services, opening_hours, price, location, description, equipment, trainers, photos)
+  + validate(): bool
+  + to_dict(): Dict
+}
+
+class User {
+  - id: int
+  - username: str
+  - role: str
+  + __init__(id, username, role)
+  + is_admin(): bool
+}
+
+' Форми
+class AddGymForm {
+  - parent: Frame
+  - gym_data: Dict
+  - name_entry: Entry
+  - address_entry: Entry
+  - services_list: Listbox
+  - hours_entry: Entry
+  - price_entry: Entry
+  - location_entry: Entry
+  - description_text: Text
+  - equipment_list: Listbox
+  - trainers_list: Listbox
+  - photos_list: Listbox
+  + __init__(parent)
+  + validate_input(): bool
+  + get_gym_data(): Dict
+  + clear_form()
+  + submit_gym()
+}
+
+class AdminPanel {
+  - parent: Frame
+  - add_gym_button: Button
+  - edit_gym_button: Button
+  - delete_gym_button: Button
+  - view_gyms_button: Button
+  + __init__(parent)
+  + show_add_gym_form()
+  + show_edit_gym_form()
+  + show_delete_gym_confirmation()
+  + show_gyms_list()
+}
+
+' Връзки
+FitnessAppGUI --> GymManager : contains
+FitnessAppGUI --> User : manages
+FitnessAppGUI --> AdminPanel : creates
+
+GymManager --> Gym : manages
+
+AdminPanel --> AddGymForm : creates
+
+AddGymForm --> Gym : creates
+
+' Сценарий
+note right of FitnessAppGUI
+  Сценарий: Добавяне на нова фитнес зала от администратор
+end note
+
+note right of AdminPanel
+  1. Администраторът влиза в системата
+  2. Отваря административния панел
+  3. Избира опция "Добави нова зала"
+  4. Попълва формата с информация за залата:
+     - Основна информация
+     - Услуги
+     - Работно време
+     - Цени
+     - Локация
+     - Описание
+     - Оборудване
+     - Треньори
+     - Снимки
+  5. Системата валидира въведената информация
+  6. Залата се добавя в базата данни
+  7. Списъкът с зали се обновява
+end note
+
+note right of AddGymForm
+  Валидация на въведените данни:
+  - Задължителни полета
+  - Правилен формат на цените
+  - Правилен формат на работното време
+  - Валидни услуги
+  - Валидно оборудване
+  - Валидни треньори
+  - Поддържани формати на снимки
+end note
+
+@enduml 

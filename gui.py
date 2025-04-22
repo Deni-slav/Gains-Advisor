@@ -21,6 +21,7 @@ class FitnessAppGUI:
 
         options = [
             ("Вход / Регистрация", self.handle_registration_login),
+            ("Моят профил", self.show_user_profile),
             ("Преглед на фитнеси", self.view_gyms),
             ("Търсене на фитнес", self.search_gyms),
             ("Любими фитнеси", self.handle_favorite_gyms),
@@ -193,7 +194,7 @@ class FitnessAppGUI:
         location = simpledialog.askstring(
             "Препоръки за фитнеси",
             "Въведете локация (град/район) за препоръки:\n\n"
-            "Пример: 'София', 'Лозенец', 'Варна'"
+            "Пример: 'Младост', 'Лозенец', 'Център'"
         )
         
         if not location or not location.strip():
@@ -253,4 +254,21 @@ class FitnessAppGUI:
         if choice == 1:
             self.gym_manager.edit_gym(self.user_manager.current_user)
         else:
-            self.gym_manager.remove_gym(self.user_manager.current_user) 
+            self.gym_manager.remove_gym(self.user_manager.current_user)
+
+    def show_user_profile(self):
+        if not self.user_manager.current_user:
+            messagebox.showerror("Грешка", "Трябва да влезете в системата, за да видите профила си!")
+            return
+
+        user = self.user_manager.current_user
+        profile_info = (
+            f"Потребителски профил:\n\n"
+            f"Потребителско име: {user.username}\n"
+            f"Имейл: {user.email}\n"
+            f"Роля: {user.role}\n"
+            f"Пълно име: {user.full_name}\n"
+            f"Брой любими зали: {len(self.favorite_gyms)}"
+        )
+        
+        messagebox.showinfo("Моят профил", profile_info) 

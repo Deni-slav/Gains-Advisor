@@ -1,0 +1,104 @@
+@startuml View Gyms Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor User
+participant "FitnessAppGUI" as GUI
+participant "GymManager" as GM
+participant "GymListView" as GLV
+participant "GymDetailsView" as GDV
+database "Gym Database" as DB
+
+' Сценарий
+== Преглед на фитнес зали ==
+
+User -> GUI: Избира "Преглед на фитнеси"
+activate GUI
+
+GUI -> GM: get_all_gyms()
+activate GM
+
+GM -> DB: Заявява всички зали
+DB --> GM: Връща списък с зали
+deactivate GM
+
+GUI -> GLV: display_gyms(gyms)
+activate GLV
+
+GLV -> User: Показва списък с зали
+note right: Име, адрес, рейтинг
+
+alt Потребителят иска филтриране
+    User -> GLV: Избира филтри
+    note right: Локация, услуги, цена
+    
+    GLV -> GM: apply_filters(criteria)
+    activate GM
+    
+    GM -> DB: Филтрира зали по критерии
+    DB --> GM: Връща филтрирани зали
+    
+    GM --> GLV: Връща филтрирани зали
+    deactivate GM
+    
+    GLV -> User: Показва филтриран списък
+end
+
+alt Потребителят избира конкретна зала
+    User -> GLV: Избира зала от списъка
+    deactivate GLV
+    
+    GLV -> GM: get_gym_by_id(gym_id)
+    activate GM
+    
+    GM -> DB: Заявява детайли за залата
+    DB --> GM: Връща детайли за залата
+    
+    GM --> GLV: Връща детайли за залата
+    deactivate GM
+    
+    GUI -> GDV: display_details(gym)
+    activate GDV
+    
+    GDV -> User: Показва детайлна информация
+    note right: Име, адрес, рейтинг, услуги,\nработно време, цена, локация
+    
+    alt Потребителят иска да види услуги
+        User -> GDV: Избира "Услуги"
+        GDV -> User: Показва списък с услуги
+    end
+    
+    alt Потребителят иска да види работно време
+        User -> GDV: Избира "Работно време"
+        GDV -> User: Показва работно време
+    end
+    
+    alt Потребителят иска да види отзиви
+        User -> GDV: Избира "Отзиви"
+        GDV -> GM: get_gym_reviews(gym_id)
+        activate GM
+        
+        GM -> DB: Заявява отзиви за залата
+        DB --> GM: Връща отзиви за залата
+        
+        GM --> GDV: Връща отзиви за залата
+        deactivate GM
+        
+        GDV -> User: Показва отзиви
+    end
+    
+    deactivate GDV
+end
+
+deactivate GLV
+deactivate GUI
+
+@enduml 

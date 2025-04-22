@@ -1,0 +1,85 @@
+@startuml Favorite Gyms Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor User
+participant "FitnessAppGUI" as GUI
+participant "GymManager" as GM
+participant "FavoriteManager" as FM
+database "Gym Database" as DB
+
+' Сценарий
+== Управление на любими фитнес зали ==
+
+== 1. Добавяне в любими ==
+User -> GUI: Избира "Добави в любими"
+activate GUI
+
+GUI -> GM: get_gym_details(gym_id)
+activate GM
+GM -> DB: Заявява информация за залата
+DB --> GM: Връща информация
+deactivate GM
+
+GUI -> FM: add_to_favorites(gym_id, user_id)
+activate FM
+
+FM -> DB: Проверява дали е вече в любими
+DB --> FM: Връща резултат
+
+alt Залата не е в любими
+    FM -> DB: Добавя в любими
+    DB --> FM: Потвърждава
+    
+    FM --> GUI: Връща успех
+    deactivate FM
+    
+    GUI -> User: Показва потвърждение
+    note right: Залата е добавена в любими
+else Залата вече е в любими
+    FM --> GUI: Връща грешка
+    deactivate FM
+    
+    GUI -> User: Показва съобщение
+    note right: Залата вече е в любими
+end
+
+== 2. Преглед на любими зали ==
+User -> GUI: Избира "Моите любими зали"
+GUI -> FM: get_favorite_gyms(user_id)
+activate FM
+
+FM -> DB: Заявява любими зали
+DB --> FM: Връща списък
+
+FM --> GUI: Връща списък
+deactivate FM
+
+GUI -> User: Показва любими зали
+note right: Име, адрес, рейтинг,\nцена, работно време
+
+== 3. Премахване от любими ==
+User -> GUI: Избира "Премахни от любими"
+GUI -> FM: remove_from_favorites(gym_id, user_id)
+activate FM
+
+FM -> DB: Премахва от любими
+DB --> FM: Потвърждава
+
+FM --> GUI: Връща успех
+deactivate FM
+
+GUI -> User: Показва потвърждение
+note right: Залата е премахната от любими
+
+deactivate GUI
+
+@enduml 

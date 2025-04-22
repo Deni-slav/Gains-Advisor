@@ -1,0 +1,131 @@
+@startuml Gym Details Viewing Scenario
+
+' Стилове
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+' Основни класове за сценария с разглеждане на детайли за фитнес зала
+class FitnessAppGUI {
+  - gym_manager: GymManager
+  + __init__(root: Tk)
+  + view_gyms()
+  + show_gym_details(gym_id: int)
+  + show_message(title: str, msg: str)
+}
+
+class GymManager {
+  - nearby_gyms: List[Gym]
+  + __init__()
+  + get_gym_by_id(gym_id: int): Gym
+  + get_gym_details(gym_id: int): str
+  + get_gym_services(gym_id: int): List[str]
+  + get_gym_reviews(gym_id: int): List[Review]
+  + get_gym_photos(gym_id: int): List[str]
+}
+
+' Модели
+class Gym {
+  - id: int
+  - name: str
+  - address: str
+  - rating: float
+  - services: List[str]
+  - opening_hours: str
+  - price: str
+  - location: str
+  - description: str
+  - equipment: List[str]
+  - trainers: List[str]
+  - photos: List[str]
+  + __init__(id, name, address, rating, services, opening_hours, price, location, description, equipment, trainers, photos)
+  + get_full_details(): str
+  + get_services_list(): str
+  + get_equipment_list(): str
+  + get_trainers_list(): str
+  + get_photos_list(): str
+}
+
+class Review {
+  - id: int
+  - gym_id: int
+  - user_id: int
+  - rating: float
+  - comment: str
+  - date: str
+  + __init__(id, gym_id, user_id, rating, comment, date)
+  + get_formatted_review(): str
+}
+
+' Форми
+class GymDetailsView {
+  - gym: Gym
+  - details_frame: Frame
+  - services_frame: Frame
+  - equipment_frame: Frame
+  - trainers_frame: Frame
+  - photos_frame: Frame
+  - reviews_frame: Frame
+  + __init__(parent, gym)
+  + display_gym_details()
+  + display_services()
+  + display_equipment()
+  + display_trainers()
+  + display_photos()
+  + display_reviews()
+  + add_to_favorites()
+  + contact_gym()
+}
+
+class ReviewList {
+  - reviews: List[Review]
+  - reviews_frame: Frame
+  + __init__(parent, reviews)
+  + display_reviews()
+  + sort_reviews(criteria: str)
+}
+
+' Връзки
+FitnessAppGUI --> GymManager : contains
+FitnessAppGUI --> GymDetailsView : creates
+
+GymManager --> Gym : manages
+GymManager --> Review : manages
+
+GymDetailsView --> Gym : displays
+GymDetailsView --> ReviewList : contains
+
+ReviewList --> Review : displays
+
+' Сценарий
+note right of FitnessAppGUI
+  Сценарий: Разглеждане на детайлна информация за фитнес зала
+end note
+
+note right of GymDetailsView
+  1. Потребителят избира фитнес зала от списъка
+  2. Системата показва детайлна информация:
+     - Основна информация (име, адрес, рейтинг, цена)
+     - Описание на залата
+     - Предлагани услуги
+     - Налично оборудване
+     - Треньори
+     - Снимки
+     - Отзиви от потребители
+  3. Потребителят може да:
+     - Добави залата в любими
+     - Свърже се с залата
+     - Разгледа отзивите
+end note
+
+note right of ReviewList
+  Отзивите могат да бъдат сортирани по:
+  - Дата (най-нови)
+  - Рейтинг (най-висок)
+  - Полезност
+end note
+
+@enduml 

@@ -1,0 +1,89 @@
+@startuml Registration Scenario
+
+' Стилове
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+' Основни класове за сценария с регистрация
+class FitnessAppGUI {
+  - user_manager: UserManager
+  + __init__(root: Tk)
+  + handle_registration_login()
+  + show_registration_form()
+  + show_login_form()
+  + show_message(title: str, msg: str)
+}
+
+class UserManager {
+  - registered_users: List[User]
+  - current_user: User
+  + __init__()
+  + register()
+  + login()
+  + logout()
+  + validate_registration(username: str, email: str, password: str): bool
+  + is_username_taken(username: str): bool
+  + is_email_taken(email: str): bool
+}
+
+' Модели
+class User {
+  - username: str
+  - email: str
+  - password: str
+  - role: str
+  - full_name: str
+  + __init__(username, email, password, role, full_name)
+  + is_valid(): bool
+}
+
+' Форми
+class RegistrationForm {
+  - username_field: Entry
+  - email_field: Entry
+  - password_field: Entry
+  - role_field: Entry
+  - full_name_field: Entry
+  - submit_button: Button
+  + __init__(parent, user_manager)
+  + validate_fields(): bool
+  + submit()
+  + show_error(message: str)
+  + show_success()
+}
+
+' Връзки
+FitnessAppGUI --> UserManager : contains
+FitnessAppGUI --> RegistrationForm : creates
+
+UserManager --> User : manages
+
+RegistrationForm --> UserManager : uses
+
+' Сценарий
+note right of FitnessAppGUI
+  Сценарий: Регистрация на нов потребител
+end note
+
+note right of RegistrationForm
+  Успешно записване:
+  1. Потребителят въвежда валидни данни
+  2. Системата проверява дали потребителското име и имейл са свободни
+  3. Създава се нов потребител
+  4. Потребителят се добавя към базата с регистрирани потребители
+  5. Показва се съобщение за успешна регистрация
+end note
+
+note right of UserManager
+  Грешно записване:
+  1. Потребителят въвежда невалидни данни
+  2. Системата проверява и открива проблем
+  3. Показва се съобщение за грешка
+  4. Потребителят не се добавя към базата
+end note
+
+@enduml 

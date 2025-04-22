@@ -1,0 +1,107 @@
+@startuml Search and Filter Scenario
+
+' Стилове
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+' Основни класове за сценария с търсене и филтриране
+class FitnessAppGUI {
+  - gym_manager: GymManager
+  + __init__(root: Tk)
+  + search_gyms()
+  + show_search_results(results: List[Gym])
+  + show_message(title: str, msg: str)
+}
+
+class GymManager {
+  - nearby_gyms: List[Gym]
+  + __init__()
+  + search_gyms(keyword: str): List[Gym]
+  + filter_gyms(criteria: Dict): List[Gym]
+  + get_gyms_by_location(location: str): List[Gym]
+  + get_gyms_by_service(service: str): List[Gym]
+  + get_gyms_by_price_range(min_price: float, max_price: float): List[Gym]
+  + get_gyms_by_rating(min_rating: float): List[Gym]
+  + recommend_gyms(location: str): List[Gym]
+}
+
+' Модели
+class Gym {
+  - id: int
+  - name: str
+  - address: str
+  - rating: float
+  - services: List[str]
+  - opening_hours: str
+  - price: str
+  - location: str
+  + __init__(id, name, address, rating, services, opening_hours, price, location)
+  + matches_criteria(criteria: Dict): bool
+  + get_details(): str
+}
+
+' Форми
+class SearchForm {
+  - keyword_field: Entry
+  - location_filter: Combobox
+  - service_filter: Combobox
+  - price_filter: Combobox
+  - rating_filter: Combobox
+  - search_button: Button
+  - reset_button: Button
+  + __init__(parent, gym_manager)
+  + search()
+  + reset_filters()
+  + get_search_criteria(): Dict
+}
+
+class SearchResultsView {
+  - results: List[Gym]
+  - results_frame: Frame
+  - sort_options: Combobox
+  + __init__(parent, results)
+  + display_results()
+  + sort_results(criteria: str)
+  + show_gym_details(gym_id: int)
+}
+
+' Връзки
+FitnessAppGUI --> GymManager : contains
+FitnessAppGUI --> SearchForm : creates
+FitnessAppGUI --> SearchResultsView : creates
+
+GymManager --> Gym : manages
+
+SearchForm --> GymManager : uses
+
+SearchResultsView --> Gym : displays
+
+' Сценарий
+note right of FitnessAppGUI
+  Сценарий: Търсене и филтриране на фитнес зали
+end note
+
+note right of SearchForm
+  1. Потребителят въвежда ключова дума за търсене
+  2. Потребителят избира филтри:
+     - Локация
+     - Услуги
+     - Цена
+     - Рейтинг
+  3. Потребителят натиска бутона за търсене
+  4. Системата показва резултати, съответстващи на критериите
+end note
+
+note right of SearchResultsView
+  Резултатите могат да бъдат сортирани по:
+  - Име
+  - Рейтинг
+  - Цена
+  - Локация
+end note
+
+@enduml 

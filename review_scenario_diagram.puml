@@ -1,0 +1,81 @@
+@startuml Review Scenario (UR6)
+
+' Стилове
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+' Основни класове за сценария с рецензии
+class ReviewManager {
+  - gym_reviews: List[Review]
+  + __init__()
+  + add_review(current_user: User, gym_manager: GymManager)
+  + view_reviews(gym_manager: GymManager)
+  + get_gym_rating(gym_id: int): float
+  + get_user_reviews(user_id: str): List[Review]
+}
+
+' Модели
+class Gym {
+  - id: int
+  - name: str
+  - address: str
+  - rating: float
+  - services: List[str]
+  - opening_hours: str
+  - price: str
+  - location: str
+  + __init__(id, name, address, rating, services, opening_hours, price, location)
+  + update_rating(new_rating: float)
+  + get_average_rating(): float
+}
+
+class User {
+  - username: str
+  - email: str
+  - password: str
+  - role: str
+  - full_name: str
+  + __init__(username, email, password, role, full_name)
+  + can_write_review(): bool
+}
+
+class Review {
+  - gym_id: int
+  - user_id: str
+  - rating: int
+  - comment: str
+  - date: datetime
+  + __init__(gym_id, user_id, rating, comment)
+  + is_valid(): bool
+  + get_formatted_date(): str
+}
+
+' Връзки
+ReviewManager --> Review : manages
+ReviewManager --> Gym : references
+ReviewManager --> User : references
+
+Review --> Gym : references
+Review --> User : references
+
+User --> Gym : reviews
+
+' Сценарий
+note right of ReviewManager
+  Сценарий UR6: Потребителите оставят рецензии и оценки
+  за посетените фитнес зали
+end note
+
+note right of Review
+  1. Потребителят избира фитнес
+  2. Въвежда оценка (1-5)
+  3. Добавя коментар (опционално)
+  4. Системата записва рецензията
+  5. Обновява се средният рейтинг на фитнеса
+end note
+
+@enduml 

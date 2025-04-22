@@ -1,0 +1,85 @@
+@startuml Simple Profile and Favorites Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor User
+participant "FitnessAppGUI" as GUI
+participant "UserManager" as UM
+participant "FavoriteManager" as FM
+database "Database" as DB
+
+' Сценарий
+== Профил и любими зали ==
+
+== 1. Профил ==
+User -> GUI: Избира "Моят профил"
+activate GUI
+
+GUI -> UM: get_user_profile(user_id)
+activate UM
+UM -> DB: Заявява информация
+DB --> UM: Връща информация
+deactivate UM
+
+GUI -> User: Показва профил
+note right: Име, имейл, роля
+
+alt Редактиране на профил
+    User -> GUI: Избира "Редактирай"
+    GUI -> UM: update_profile(user_id, data)
+    activate UM
+    UM -> DB: Обновява информация
+    DB --> UM: Потвърждава
+    deactivate UM
+    GUI -> User: Показва потвърждение
+end
+
+== 2. Любими зали ==
+User -> GUI: Избира "Любими зали"
+GUI -> FM: get_favorite_gyms(user_id)
+activate FM
+
+FM -> DB: Заявява любими
+DB --> FM: Връща списък
+FM --> GUI: Връща списък
+deactivate FM
+
+GUI -> User: Показва любими зали
+note right: Име, адрес, рейтинг
+
+alt Управление на любими
+    User -> GUI: Избира действие
+    note right: Добавяне/Премахване
+    
+    GUI -> FM: manage_favorites(action, gym_id)
+    activate FM
+    FM -> DB: Изпълнява действие
+    DB --> FM: Потвърждава
+    FM --> GUI: Връща резултат
+    deactivate FM
+    
+    GUI -> User: Показва потвърждение
+end
+
+== 3. Изход ==
+User -> GUI: Избира "Изход"
+GUI -> UM: logout_user()
+activate UM
+UM -> DB: Обновява статус
+DB --> UM: Потвърждава
+deactivate UM
+
+GUI -> User: Показва съобщение
+note right: Успешен изход
+
+deactivate GUI
+
+@enduml 

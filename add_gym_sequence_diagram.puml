@@ -1,0 +1,116 @@
+@startuml Add Gym Sequence Diagram
+
+' Стилове
+skinparam sequence {
+  ArrowColor Black
+  ActorBorderColor Black
+  LifeLineBorderColor Black
+  ParticipantBorderColor Black
+  ParticipantBackgroundColor White
+}
+
+' Участници
+actor "Admin User" as Admin
+participant "FitnessAppGUI" as GUI
+participant "GymManager" as GM
+participant "AddGymForm" as AGF
+participant "ValidationManager" as VM
+database "Gym Database" as DB
+
+' Сценарий
+== Добавяне на нова фитнес зала ==
+
+Admin -> GUI: Избира "Добави нова зала"
+activate GUI
+
+GUI -> AGF: show_add_gym_form()
+activate AGF
+
+AGF -> Admin: Показва форма за добавяне
+note right: Полета за основна информация
+
+alt Въвеждане на основна информация
+    Admin -> AGF: Въвежда основна информация
+    note right: Име, адрес, район
+    
+    AGF -> VM: validate_basic_info(info)
+    activate VM
+    
+    VM --> AGF: Връща резултат от валидация
+    deactivate VM
+    
+    alt Валидацията е успешна
+        AGF -> Admin: Показва следваща стъпка
+    else Валидацията е неуспешна
+        AGF -> Admin: Показва грешки
+        note right: Съобщения за корекция
+    end
+end
+
+alt Въвеждане на услуги
+    Admin -> AGF: Избира услуги
+    note right: Кардио, силови, групови класове,\nйога, спа зона и др.
+    
+    AGF -> VM: validate_services(services)
+    activate VM
+    
+    VM --> AGF: Връща резултат от валидация
+    deactivate VM
+end
+
+alt Въвеждане на работно време
+    Admin -> AGF: Въвежда работно време
+    note right: По дни от седмицата
+    
+    AGF -> VM: validate_hours(hours)
+    activate VM
+    
+    VM --> AGF: Връща резултат от валидация
+    deactivate VM
+end
+
+alt Въвеждане на цена
+    Admin -> AGF: Въвежда цена
+    note right: Месечен абонамент
+    
+    AGF -> VM: validate_price(price)
+    activate VM
+    
+    VM --> AGF: Връща резултат от валидация
+    deactivate VM
+end
+
+alt Потвърждение и запазване
+    Admin -> AGF: Натиска "Добави зала"
+    deactivate AGF
+    
+    AGF -> GM: add_gym(gym_data)
+    activate GM
+    
+    GM -> VM: validate_all_data(gym_data)
+    activate VM
+    
+    VM --> GM: Връща финален резултат
+    deactivate VM
+    
+    alt Всички данни са валидни
+        GM -> DB: Запазва нова зала
+        DB --> GM: Потвърждава запазване
+        
+        GM --> GUI: Връща успех
+        deactivate GM
+        
+        GUI -> Admin: Показва потвърждение
+        note right: Съобщение за успешно\nдобавяне на зала
+    else Има грешки във валидацията
+        GM --> GUI: Връща грешки
+        deactivate GM
+        
+        GUI -> Admin: Показва грешки
+        note right: Списък с грешки\nза корекция
+    end
+end
+
+deactivate GUI
+
+@enduml 
