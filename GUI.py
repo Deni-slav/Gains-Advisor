@@ -295,10 +295,10 @@ class FitnessAppGUI:
             return
         
         gyms_text = "\n\n".join([
-            f"🏋️ {g.name}\n"
-            f"📍 Адрес: {g.address}\n"
-            f"⭐ Рейтинг: {g.rating}/5.0\n"
-            f"🆔 ID: {g.id}"
+            f" {g.name}\n"
+            f" Адрес: {g.address}\n"
+            f" Рейтинг: {g.rating}/5.0\n"
+            f" ID: {g.id}"
             for g in valid_gyms
         ])
         
@@ -350,12 +350,12 @@ class FitnessAppGUI:
             return
             
         results_text = "\n\n".join([
-            f"🏋️ Име: {g.name}\n"
-            f"📍 Адрес: {g.address}\n"
-            f"⭐ Рейтинг: {getattr(g, 'rating', 'няма')}\n"
-            f"🕒 Работно време: {getattr(g, 'opening_hours', 'няма информация')}\n"
-            f"💵 Цена: {getattr(g, 'price', 'няма информация')}\n"
-            f"🔧 Услуги: {', '.join(getattr(g, 'services', []))}"
+            f" Име: {g.name}\n"
+            f" Адрес: {g.address}\n"
+            f" Рейтинг: {getattr(g, 'rating', 'няма')}\n"
+            f"Работно време: {getattr(g, 'opening_hours', 'няма информация')}\n"
+            f" Цена: {getattr(g, 'price', 'няма информация')}\n"
+            f" Услуги: {', '.join(getattr(g, 'services', []))}"
             for g in valid_results
         ])
         
@@ -695,10 +695,10 @@ class FitnessAppGUI:
                 message = [
                     f"Топ препоръки за {location}:\n",
                     *[
-                        f"{i+1}. {g.name}\n"
-                        f"   ⭐ Рейтинг: {g.rating}/5\n"
-                        f"   💰 Цена: {g.price}\n"
-                        f"   🏠 Адрес: {getattr(g, 'address', 'няма информация')}\n"
+                        f" {i+1}. {g.name}\n"
+                        f" Рейтинг: {g.rating}/5\n"
+                        f" Цена: {g.price}\n"
+                        f" Адрес: {getattr(g, 'address', 'няма информация')}\n"
                         for i, g in enumerate(sorted_gyms[:5])  # Show top 5 results
                     ],
                     f"\nНамерени общо {len(sorted_gyms)} фитнеса."
